@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+	"adder",
+	"multiplier",
+	"gray_code",
+	"boolean_evaluator", "truth_table", "bin_tree",
+]
+
+resolver = "2"
