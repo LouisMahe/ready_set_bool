@@ -2,7 +2,7 @@
 
 use adder::adder;
 
-fn multiplier(a: u32, b:u32) -> u32
+pub fn multiplier(a: u32, b:u32) -> u32
 {
     let mut res = 0;
     let mut cb = b;
@@ -19,6 +19,10 @@ fn multiplier(a: u32, b:u32) -> u32
     res
 }
 
+
+#[cfg(test)]
+mod test{
+    use super::*;
 #[test]
 fn test()
 {
@@ -30,4 +34,5 @@ fn test()
     assert_eq!(r2, 0);
     assert_eq!(r3,0);
     assert_eq!(r4, 11025);
+}
 }

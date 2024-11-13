@@ -35,3 +35,18 @@ pub fn powerset(set : Vec<i32>) -> Vec<Vec<i32>>
     powerset
 }
 
+
+
+#[cfg(test)]
+mod test{
+
+    use super::*;
+    #[test]
+    fn powerset_test()
+    {
+        let v = Vec::new();
+        assert_eq!(powerset(v), vec![vec![]]);
+        let v = vec![1,2];
+        assert_eq!(powerset(v), vec![vec![], vec![1], vec![2], vec![1,2]]);
+    }
+}

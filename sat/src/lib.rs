@@ -1,6 +1,6 @@
 use boolean_evaluator::*;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SatError
 {
     NoVarError,
@@ -63,4 +63,20 @@ pub fn sat(formula: &str) -> Result<bool, SatError>
     }
 
     Ok(false)
+}
+
+
+#[cfg(test)]
+mod test
+{
+    use super::*;
+
+    #[test]
+    fn sat_test()
+    {
+        assert_eq!(sat("AB=AB!&&"), Ok(false));
+        assert_eq!(sat("==||"), Err(SatError::NoVarError));
+        assert_eq!(sat("AB^CD|"), Err(SatError::EvalError));
+        assert_eq!(sat("A1|A!&"), Ok(true));
+    }
 }
