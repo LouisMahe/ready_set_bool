@@ -5,6 +5,7 @@ fn main()
 	let args: Vec<String> = args().collect();
 	if args.len() != 2
 	{
+		println!("Enter a logical assertion with variables eg: \'AB!&\'");
 		return ;
 	}
 	let res = truth_table(&args[1]);

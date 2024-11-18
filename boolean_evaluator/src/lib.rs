@@ -2,6 +2,7 @@
 use std::fmt::Display;
 use std::fmt::Write;
 use bin_tree::*;
+use std::env;
 
 pub const NEG: char = '!';
 pub const AND: char = '&';
@@ -20,13 +21,13 @@ pub enum Token
     Boolean(bool),
     Operator(char),
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParseError
 {
     InvalidFormula,
     InvalidToken,
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum  EvalError{
     InvalidTree(String)
 }
@@ -164,9 +165,25 @@ pub fn eval_formula(formula:  &str) -> Result<bool, EvalError>
         Ok(t) => t,
         Err(_e) => {return Err(EvalError::InvalidTree(String::from("Could not build tree from input")));},
     };
-    println!("The logical tree is: ");
-    bin_tree::print_tree(tree.clone());
+    let print = env::var("RUST_PRINT").unwrap_or_else(|_e| "false".to_string()) == "true";
+    if print{
+        println!("The logical tree is: ");
+        bin_tree::print_tree(tree.clone());
+    }
     unfold(tree)
 }
 
 
+#[cfg(test)]
+mod test{
+    use super::*;
+
+    #[test]
+    fn bool_eval_test()
+    {
+        assert_eq!(eval_formula("10&"), Ok(false));
+        assert_eq!(eval_formula("11!|"), Ok(true));
+        assert_eq!(eval_formula("1w&"), Err(EvalError::InvalidTree("Could not build tree from input".to_string())));
+        assert_eq!(eval_formula("1011||="), Ok(true));
+    }
+}

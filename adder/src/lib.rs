@@ -13,6 +13,9 @@ pub fn adder(a: u32, b: u32) -> u32
     }
 }
 
+#[cfg(test)]
+mod tests{
+    use super::*;
 #[test]
 fn first_test()
 {
@@ -22,4 +25,4 @@ fn first_test()
     assert_eq!(res, 51);
     assert_eq!(res2, 2);
     assert_eq!(res3, 0);
-}
+}}
