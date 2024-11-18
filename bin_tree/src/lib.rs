@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use text_trees::TreeNode;
 
 
-pub type Leave<T> = Rc<RefCell<Node<T>>>;
+pub type Leaf<T> = Rc<RefCell<Node<T>>>;
 pub type Branch<T> = Option<Rc<RefCell<Node<T>>>>;
 #[derive(Debug, Clone)]
 pub struct Node<T : Display + Clone>
@@ -45,24 +45,24 @@ where T : Display + Clone,
 }
 
 
-pub fn make_print_tree<T: Display + Clone>(root : Leave<T>) -> TreeNode<T>
+pub fn make_print_tree<T: Display + Clone>(root : Leaf<T>) -> TreeNode<T>
 {
     let mut curr_node = TreeNode::new(root.borrow().elem.clone());
-	let curr_leave = root.borrow();
-	if let Some(left_leave) = &curr_leave.left
+	let curr_leaf = root.borrow();
+	if let Some(left_leaf) = &curr_leaf.left
 	{
-		let node = make_print_tree(left_leave.clone());
+		let node = make_print_tree(left_leaf.clone());
 		curr_node.push_node(node);
 	}
-	if let Some(right_leave) = &curr_leave.right
+	if let Some(right_leaf) = &curr_leaf.right
 	{
-		let node = make_print_tree(right_leave.clone());
+		let node = make_print_tree(right_leaf.clone());
 		curr_node.push_node(node);
 	}
 	curr_node
 }
 
-pub fn print_tree<T : Display + Clone>(root: Leave<T>)
+pub fn print_tree<T : Display + Clone>(root: Leaf<T>)
 {
     let tree = make_print_tree(root);
 	tree.write(&mut std::io::stdout()).unwrap();

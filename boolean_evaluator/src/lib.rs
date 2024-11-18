@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use std::{fmt::Display, rc::Rc};
+use std::fmt::Display;
 use std::fmt::Write;
 use bin_tree::*;
 
@@ -14,7 +14,6 @@ pub const F: char = '0';
 
 pub const OPERATOR_LIST: [char; 6] = [NEG, AND, OR, XOR, EQUIV, IMPL];
 
-type NodeRef = Rc<Node>;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token
 {
@@ -53,26 +52,12 @@ impl Display for EvalError
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Node
-{
-    val: Token,
-    left: Option<NodeRef>,
-    right: Option<NodeRef>,
-}
 
-impl Node
-{
-    pub fn new_node(val: Token, left: Option<NodeRef>, right: Option<NodeRef>) -> Self
-    {
-        Self{val: val, left: left, right: right}
-    }
-}
 
-pub fn build_tree(formula: &str) -> Result<Leave<Token>, ParseError>
+pub fn build_tree(formula: &str) -> Result<Leaf<Token>, ParseError>
 {
     let mut chars = formula.chars();
-    let mut stack: Vec<Leave<Token>> = Vec::new();
+    let mut stack: Vec<Leaf<Token>> = Vec::new();
 
     while let Some(c) = chars.next()
     {
@@ -121,7 +106,7 @@ fn equivalence(p: bool, q: bool) -> bool
 }
 
 
-fn unfold(tree: bin_tree::Leave<Token>) -> Result<bool, EvalError>
+fn unfold(tree: bin_tree::Leaf<Token>) -> Result<bool, EvalError>
 {
     let root = tree.borrow();
     if root.left.is_none() && root.right.is_none()
