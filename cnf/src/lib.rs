@@ -1,7 +1,7 @@
 
 use boolean_evaluator::eval_formula;
 use std::collections::HashMap;
-
+#[derive(Debug)]
 pub enum CnfError
 {
     NoVarError,
@@ -56,7 +56,7 @@ fn generate_cnf_elem(vars : &Vec<char>, values : &Vec<u8>) -> String
     res
 }
 
-pub fn conjunctive_normal_form(formula :&str) -> Result<String, CnfError>
+pub fn conjunctive_normal_form_brute_force(formula :&str) -> Result<String, CnfError>
 {
     let vars = parse_input(formula);
     if vars.is_empty(){
@@ -178,11 +178,15 @@ fn build_hashmap(implicants : &Vec<Vec<u8>>, minterm : &Vec<Vec<u8>>) -> HashMap
     hash
 }
 
+pub fn count_dash(v : &Vec<u8>) -> usize
+{
+    v.iter().filter(|&c| *c == 45).count()
+}
+
 pub fn get_essentials(mut map : HashMap<Vec<u8>, Vec<usize>>, minterms : &Vec<Vec<u8>>) -> Vec<Vec<u8>>
 {
     let mut essentials : Vec<Vec<u8>> = Vec::new();
     let mut index : Vec<usize>= (0..minterms.len()).collect();
-    println!("index at start is : {:?}", index);
 
     for i in 0..minterms.len()
     {
@@ -209,29 +213,27 @@ pub fn get_essentials(mut map : HashMap<Vec<u8>, Vec<usize>>, minterms : &Vec<Ve
                 values.retain(|&x| x != i);
             }
         }
+        if index.is_empty() {break;}
     }
-    println!("essentials are {:?}", essentials);
-    println!("index after getting first essentials : {:?}", index);
     let mut best = 0;
     while !index.is_empty()
     {
-        println!("new round of purging index {:?}", essentials);
         let mut candidate : Vec<u8> = Vec::new();
         let mut candidate_index : Vec<usize> = Vec::new();
         for (key, value) in &mut map
         {
             let mut actual = 0;
-            for i in 0..index.len()
+            for i in &index
             {
                 if value.contains(&i)
                 {
                     actual += 1;
-                    if actual > best{
-                        best = actual;
-                        candidate = key.clone();
-                        candidate_index = value.clone();
-                    }
                 }
+            }
+            if actual > best || (actual == best && count_dash(key) > count_dash(&candidate)){
+                best = actual;
+                candidate = key.clone();
+                candidate_index = value.clone();
             }
         }
         map.remove(&candidate);
@@ -244,6 +246,25 @@ pub fn get_essentials(mut map : HashMap<Vec<u8>, Vec<usize>>, minterms : &Vec<Ve
         index.retain(|x| !candidate_index.contains(x));
     }
     essentials
+}
+
+fn string_representation(v : &Vec<u8>, vars : &Vec<char>) -> String
+{
+    let mut res = String::new();
+    let mut count = 0;
+    for i in 0..v.len()
+    {
+        match v[i]{
+            1 => {res.push(vars[i]); res.push('!'); count+=1;},
+            0 => {res.push(vars[i]); count+=1;},
+            _ => (),
+        }
+    }
+    for _ in 1..count
+    {
+        res.push('|');
+    }
+    res
 }
 
 pub fn quine_mccluskey(formula :&str) -> Result<String, CnfError>
@@ -267,14 +288,23 @@ pub fn quine_mccluskey(formula :&str) -> Result<String, CnfError>
             Err(_e) => return Err(CnfError::FormulaError),
         }
     }
-    println!("minterms are {:?}", v);
     let prime_implicants = prime_implicants(&v);
-    println!("prime implicants are {:?}", prime_implicants);
     let map = build_hashmap(&prime_implicants, &v);
-    println!("hashmap from implicants {:?}", map);
     let essentials = get_essentials(map, &v);
-    for v in essentials{
-        println!("{:?}", v);
+    let mut dnf = String::new();
+    for v in essentials.iter(){
+        dnf += &string_representation(v, &vars);
     }
-    Ok(String::new())
+    for _ in 1..essentials.len()
+    {
+        dnf.push('&');
+    }
+    Ok(dnf)
+}
+
+
+pub fn conjunctive_normal_form(formula : &str) -> Result<String, CnfError>
+{
+    let negated = String::from(formula) + &"!";
+    quine_mccluskey(&negated)
 }

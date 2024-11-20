@@ -53,9 +53,17 @@ impl BaseFourRepr
         res
     }
 
+    fn as_string(&self) -> String
+    {
+        let u = self.to_int().to_string();
+        let res = "0".repeat(10 - u.len());
+        res + &u
+    }
+
     fn to_float(& self) -> f64
     {
-        let res = "0.".to_string() + &self.to_int().to_string();
+        let fract_part = self.as_string();
+        let res = "0.".to_string() + &fract_part;
         res.parse::<f64>().unwrap()
     }
 
@@ -81,7 +89,9 @@ impl BaseFourRepr
 
     }
 
-    fn from_float(f : f64) -> Result<BaseFourRepr, BFRError>
+   
+
+    pub fn from_float(f : f64) -> Result<BaseFourRepr, BFRError>
     {
      
         let str_rep = f.to_string();
@@ -102,6 +112,10 @@ impl BaseFourRepr
         if frac_part.len() > 10{
             return Err(BFRError::NoAntecendent);
         }
+        while frac_part.len() != 10
+        {
+            frac_part.push('0');
+        }
         let mut u64 = frac_part.parse::<u64>().unwrap();
         if u64 >  4294967295
         {
@@ -118,7 +132,7 @@ impl BaseFourRepr
         
     }
 
-    fn retrieve_pair(&self) -> (u16,u16)
+    pub fn retrieve_pair(&self) -> (u16,u16)
     {
         let mut first : u16 = 0;
         let mut second : u16 = 0;
@@ -130,11 +144,23 @@ impl BaseFourRepr
         {
             second = second*4 + self.digits[i];
         }
-        (first, second)
+        (second, first)
     }
 
 }
 
+
+pub fn map(x : u16, y: u16) -> f64
+{
+    let serial = BaseFourRepr::from_u16(x, y);
+    serial.to_float()
+}
+
+pub fn reverse_map(f : f64) -> Result<(u16, u16), BFRError>
+{
+    let serial = BaseFourRepr::from_float(f)?;
+    Ok(serial.retrieve_pair())
+}
 
 #[cfg(test)]
 #[allow(unused)]
@@ -191,7 +217,10 @@ mod test
         let mut frep = BaseFourRepr::new();
         frep.register_two_u16(u16::MAX, u16::MAX);
         let f = frep.to_float();
-        assert_eq!(f, 0.4294967295)
+        assert_eq!(f, 0.4294967295);
+        let frep = BaseFourRepr {digits : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]};
+        let f = frep.to_float();
+        assert_eq!(f, 0.0000000001);
 
     }
 
@@ -214,5 +243,13 @@ mod test
         assert_eq!(BaseFourRepr::from_float(f), Err(BFRError::OutOfRange));
         let f = 0.000000000005;
         assert_eq!(BaseFourRepr::from_float(f), Err(BFRError::NoAntecendent));
+        let f = 0.1;
+        assert_eq!(BaseFourRepr::from_float(f), Ok(BaseFourRepr {digits : [0, 3, 2, 3, 2, 1, 2, 2, 3, 0, 2, 2, 0, 0, 0, 0]}));
+        let f = 0.001;
+        assert_eq!(BaseFourRepr::from_float(f), Ok(BaseFourRepr {digits : [0, 0, 0, 0, 2, 1, 2, 0, 2, 1, 1, 2, 2, 0, 0, 0]}));
+        let f = 0.0000000001;
+        assert_eq!(BaseFourRepr::from_float(f), Ok(BaseFourRepr {digits : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]}));
+
+        
     }
 }

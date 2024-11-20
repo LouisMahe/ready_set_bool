@@ -1,21 +1,21 @@
 use negation_normal_form::*;
-
+use std::env::args;
 
 fn main()
 {
-	let s = "AB=CD&!!!&!".to_string();
-	let tree = build_tree(&s);
-	if tree.is_ok()
+	let args : Vec<String> = args().skip(1).collect();
+	if args.len() != 1
 	{
-		let tree = tree.unwrap();
-		bin_tree::print_tree(tree.clone());
-		remove_implies(&tree);
-		normalize_neg(&tree);
-		normalize_neg(&tree);
-		bin_tree::print_tree(tree.clone());
-		let back = string_from_tree(tree);
-		println!("{back}");
+		println!("Enter a logical formula that will be taken to negation normal form eg \'A!!\' -> \'A\'");
+		return;
 	}
+	let nnf = negation_normal_form(&args[0]);
+	match nnf
+	{
+		Ok(s) => println!("{s}"),
+		Err(e) => println!("Could not build a nnf from imput : {:?}", e),
+	}
+	
 
 }
 

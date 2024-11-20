@@ -14,6 +14,7 @@ pub const F: char = '0';
 
 pub const OPERATOR_LIST: [char; 6] = [NEG, AND, OR, XOR, EQUIV, IMPL];
 
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token
 {
@@ -180,4 +181,17 @@ pub fn normalize_neg(root : &Leaf<Token>)
     {
         normalize_neg(right);
     }
+}
+
+pub fn negation_normal_form(formula : &str) -> Result<String , ParseError>
+{
+    let tree = build_tree(formula)?;
+    println!("original tree:\n");
+    bin_tree::print_tree(tree.clone());
+	remove_implies(&tree);
+	normalize_neg(&tree);
+	normalize_neg(&tree);
+    println!("\nnegation normal form tree: \n");
+	bin_tree::print_tree(tree.clone());
+    Ok(string_from_tree(tree))
 }

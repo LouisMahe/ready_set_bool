@@ -1,5 +1,5 @@
 [package]
-name = "map"
+name = "map_u16"
 version = "0.1.0"
 edition = "2021"
 
