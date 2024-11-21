@@ -1,4 +1,6 @@
 
+use std::cell::RefCell;
+use std::rc::Rc;
 #[allow(dead_code)]
 use std::fmt::Display;
 use bin_tree::*;
@@ -107,6 +109,30 @@ pub fn string_from_tree(root : Leaf<Token>) -> String
 }
 
 
+pub fn remove_equivalent(root :&Leaf<Token>)
+{
+    let mut node = root.borrow_mut();
+    if node.elem == Token::Op(EQUIV)
+    {
+        node.elem = Token::Op(AND);
+        let left = node.left.take().unwrap();
+        let right = node.right.take().unwrap();
+        let left_copy = Rc::new(RefCell::new(left.borrow().clone()));
+        let right_copy = Rc::new(RefCell::new(right.borrow().clone()));
+        let insert_left = Node::new(Token::Op(IMPL), Some(left.clone()), Some(right.clone()));
+        let insert_right = Node::new(Token::Op(IMPL), Some(right_copy), Some(left_copy));
+        node.left = Some(insert_left);
+        node.right = Some(insert_right);
+    }
+    if let Some(left) = &node.left{
+        remove_equivalent(left);
+    }
+    if let Some(right) = &node.right
+    {
+        remove_equivalent(right);
+    }
+}
+
 pub fn remove_implies(root : &Leaf<Token>)
 {
     let mut node = root.borrow_mut();
@@ -188,10 +214,40 @@ pub fn negation_normal_form(formula : &str) -> Result<String , ParseError>
     let tree = build_tree(formula)?;
     println!("original tree:\n");
     bin_tree::print_tree(tree.clone());
-	remove_implies(&tree);
+	remove_equivalent(&tree);
+    println!("Equivalences removed \n");
+    bin_tree::print_tree(tree.clone());
+    remove_implies(&tree);
+    println!("Implies removed \n");
+    bin_tree::print_tree(tree.clone());
 	normalize_neg(&tree);
 	normalize_neg(&tree);
     println!("\nnegation normal form tree: \n");
 	bin_tree::print_tree(tree.clone());
     Ok(string_from_tree(tree))
+}
+
+
+#[cfg(test)]
+mod test
+{
+    use super::*;
+
+    #[test]
+    fn neg_test()
+    {
+        let res = negation_normal_form("AB&!").unwrap();
+        assert_eq!(res, "A!B!|");
+        let res = negation_normal_form("AB|!").unwrap();
+        assert_eq!(res, "A!B!&");
+        let res = negation_normal_form("AB>").unwrap();
+        assert_eq!(res, "A!B|");
+        let res = negation_normal_form("AB=").unwrap();
+        assert_eq!(res, "A!B|B!A|&");
+        let res = negation_normal_form("AB|C&!").unwrap();
+        assert_eq!(res, "A!B!&C!|");
+        let res = negation_normal_form("PQ&RS|!|!TU!&>").unwrap();
+        assert_eq!(res, "PQ&R!S!&|TU!&|");
+
+    }
 }

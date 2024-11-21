@@ -78,5 +78,7 @@ mod test
         assert_eq!(sat("==||"), Err(SatError::NoVarError));
         assert_eq!(sat("AB^CD|"), Err(SatError::EvalError));
         assert_eq!(sat("A1|A!&"), Ok(true));
+        assert_eq!(sat("AA!="), Ok(false));
+        assert_eq!(sat("PQ=P!R&>"), Ok(true));
     }
 }

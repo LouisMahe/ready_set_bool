@@ -60,7 +60,6 @@ pub fn eval_set(formula : &str, sets: Vec<Vec<i32>>) -> Result<Vec<i32>, EvalSet
             let value = if sets[idx].contains(&elem) {b'1' as char} else {b'0' as char};
             formula = formula.replace(&var.to_string(), &value.to_string());
         }
-        println!("evaluating with formula {formula}");
         if let Ok(res) = eval_formula(&formula)
         {
             match res{
@@ -76,4 +75,27 @@ pub fn eval_set(formula : &str, sets: Vec<Vec<i32>>) -> Result<Vec<i32>, EvalSet
 
     Ok(res_set)
 
+}
+
+
+#[cfg(test)]
+mod test
+{
+    use super::*;
+
+    #[test]
+    fn eval_set_test()
+    {
+        let sets = vec![vec![0,1,2], vec![0,3,4]];
+        let result = eval_set("AB&", sets);
+        assert_eq!(result.unwrap(), vec![0]);
+        let sets = vec![vec![0,1,2]];
+        let result = eval_set("A!", sets);
+        assert_eq!(result.unwrap(), vec![]);
+        let sets = vec![vec![1,2], vec![1,3], vec![1,4]];
+        let result = eval_set("ABC||", sets).unwrap();
+        assert_eq!(result, vec![1,2,3,4]);
+
+
+    }
 }

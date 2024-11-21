@@ -26,5 +26,4 @@ fn main()
             println!("Enter either two integers or a float");
         }
     }
-    
 }

@@ -148,7 +148,7 @@ fn prime_implicants(minterm: &Vec<Vec<u8>>) -> Vec<Vec<u8>>
     else{
         prime_implicants(&implicants)
     }
-    
+
 
 }
 
@@ -187,9 +187,9 @@ pub fn get_essentials(mut map : HashMap<Vec<u8>, Vec<usize>>, minterms : &Vec<Ve
 {
     let mut essentials : Vec<Vec<u8>> = Vec::new();
     let mut index : Vec<usize>= (0..minterms.len()).collect();
-
     for i in 0..minterms.len()
     {
+        if !index.contains(&i) {continue;}
         let mut count = 0;
         let mut candidate : Vec<u8> = Vec::new();
         let mut candidate_index : Vec<usize> = Vec::new();
@@ -202,7 +202,7 @@ pub fn get_essentials(mut map : HashMap<Vec<u8>, Vec<usize>>, minterms : &Vec<Ve
                     candidate_index = values.clone();
                 }
                 count += 1;
-            }            
+            }
         }
         if count == 1{
             map.remove(&candidate);
@@ -291,6 +291,7 @@ pub fn quine_mccluskey(formula :&str) -> Result<String, CnfError>
     let prime_implicants = prime_implicants(&v);
     let map = build_hashmap(&prime_implicants, &v);
     let essentials = get_essentials(map, &v);
+    println!("essentials are {:?}", essentials);
     let mut dnf = String::new();
     for v in essentials.iter(){
         dnf += &string_representation(v, &vars);
@@ -308,3 +309,52 @@ pub fn conjunctive_normal_form(formula : &str) -> Result<String, CnfError>
     let negated = String::from(formula) + &"!";
     quine_mccluskey(&negated)
 }
+
+
+/*
+tests might fail because the hashmap is not ordered hence the function can produce different equivalent result
+*/
+
+#[cfg(test)]
+mod test{
+    use truth_table::truth_table;
+
+    use crate::conjunctive_normal_form;
+
+
+    #[test]
+    fn basic_test()
+    {
+        let res = conjunctive_normal_form("AB&!").unwrap_or_default();
+        assert_eq!(res, "A!B!|");
+        let res = conjunctive_normal_form("AB|C|D|").unwrap_or_default();
+        assert_eq!(res, "ABCD|||");
+        let res = conjunctive_normal_form("AB&C&D&").unwrap_or_default();
+        assert!(res == "BADC&&&" || res == "BACD&&&");
+        let res = conjunctive_normal_form("AB&!C!|").unwrap_or_default();
+        assert_eq!(res, "A!B!C!||");
+        let res = conjunctive_normal_form("AB|!C!&").unwrap_or_default();
+        assert_eq!(res, "A!B!C!&&");
+    }
+
+    #[test]
+    fn other_test()
+    {
+        let res = conjunctive_normal_form("A!BC!D!&&&AB!C!D!&&&AB!CD!&&&AB!CD&&&ABC!D!&&&ABCD&&&|||||").unwrap_or_default();
+        let res_table = truth_table(&res).unwrap_or_default();
+        let input_table = truth_table("A!BC!D!&&&AB!C!D!&&&AB!CD!&&&AB!CD&&&ABC!D!&&&ABCD&&&|||||").unwrap_or_default();
+        assert_eq!(res_table, input_table);
+        let res = conjunctive_normal_form("PQ=P!R&>").unwrap_or_default();
+        assert_eq!(res, "PQR||P!Q!|&");
+    }
+}
+
+
+
+
+
+/*
+
+(A v B) (A v C!) (B! v C! v D) (A v D!) (A v B! v D!) (C v D!)
+
+*/

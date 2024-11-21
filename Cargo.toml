@@ -4,7 +4,7 @@ members = [
 	"adder",
 	"multiplier",
 	"gray_code",
-	"boolean_evaluator", "truth_table", "bin_tree", "sat", "powerset", "eval_set", "cnf", "map_u16", "negation_normal_form",
+	"boolean_evaluator", "truth_table", "bin_tree", "sat", "powerset", "eval_set", "cnf", "map_u16", "negation_normal_form", "map_u16_2",
 ]
 
 resolver = "2"

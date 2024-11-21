@@ -23,7 +23,8 @@ pub fn powerset(set : Vec<i32>) -> Vec<Vec<i32>>
     let mut powerset = Vec::new();
     if set.is_empty() {
         powerset.push(Vec::new());
-        return powerset;}
+        return powerset;
+    }
     let combinations = generate_combinations(set.len());
     for combi in combinations
     {
