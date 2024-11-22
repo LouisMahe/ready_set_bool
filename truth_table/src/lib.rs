@@ -1,5 +1,6 @@
 use std::fmt::Write;
 use boolean_evaluator::*;
+use gray_code::generate_gray_combinations;
 
 #[derive(Debug)]
 pub enum TableError
@@ -19,7 +20,7 @@ pub enum TableError
 //     }
 // }
 
-pub fn parse_input(input: &str) -> Vec<char>
+fn parse_input(input: &str) -> Vec<char>
 {
     let mut var = Vec::new();
     for c in b'A'..= b'Z'
@@ -32,7 +33,8 @@ pub fn parse_input(input: &str) -> Vec<char>
     var
 }
 
-pub fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
+#[allow(dead_code)]
+fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
 {
     let mut combinations = Vec::new();
     let total_combinations = 1 << var_num;
@@ -56,7 +58,7 @@ pub fn truth_table(input: &str) -> Result<String, TableError>
     if variables.is_empty(){
         return Err(TableError::NoVarError);
     }
-    let combinations = generate_combinations(variables.len());
+    let combinations = generate_gray_combinations(variables.len());
     for c in &variables
     {
         write!(&mut table, "| {} ", *c).unwrap();

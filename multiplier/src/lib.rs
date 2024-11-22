@@ -30,9 +30,13 @@ fn test()
     let r2 = multiplier(0, 6);
     let r3 = multiplier(8, 0);
     let r4 = multiplier(147, 75);
+    let r5 = multiplier(176, 1);
+    let r6 = multiplier(u32::MAX, 2);
     assert_eq!(r1, 18);
     assert_eq!(r2, 0);
     assert_eq!(r3,0);
     assert_eq!(r4, 11025);
+    assert_eq!(r5, 176);
+    assert_eq!(r6, u32::MAX - 1);
 }
 }

@@ -10,6 +10,9 @@ fn main()
         let y = args[1].parse::<u16>().unwrap();
         let f = map(x,y);
         println!("map({}, {}) = {}", x, y, f);
+        let u = reverse_map(f);
+        println!("reverse_map({f}) -> {:?}", u);
+
     }
     else if args.len() == 1
     {
@@ -18,7 +21,7 @@ fn main()
         match rev
         {
             Ok(x) => println!("reverse_map({}) = {:?}", f, x),
-            Err(e) => println!("Could not find an antecedent for this float {:?}", e),
+            Err(e) => println!("Could not find an antecedent for this float: {:?}", e),
         }
     }
     else {

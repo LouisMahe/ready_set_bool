@@ -95,6 +95,9 @@ mod test
         let sets = vec![vec![1,2], vec![1,3], vec![1,4]];
         let result = eval_set("ABC||", sets).unwrap();
         assert_eq!(result, vec![1,2,3,4]);
+        let sets = vec![vec![1,3,5], vec![1,2,3,4,5,6]];
+        let result = eval_set("BA!&", sets).unwrap();
+        assert_eq!(result, vec![2,4,6]);
 
 
     }

@@ -1,6 +1,8 @@
 
 use boolean_evaluator::eval_formula;
+use gray_code::generate_gray_combinations;
 use std::collections::HashMap;
+
 #[derive(Debug)]
 pub enum CnfError
 {
@@ -21,6 +23,8 @@ fn parse_input(input: &str) -> Vec<char>
     var
 }
 
+//replace generate_gray_code by this function if the first one is not found
+#[allow(dead_code)]
 fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
 {
     let mut combinations = Vec::new();
@@ -62,7 +66,7 @@ pub fn conjunctive_normal_form_brute_force(formula :&str) -> Result<String, CnfE
     if vars.is_empty(){
         return Err(CnfError::NoVarError);
     }
-    let comb = generate_combinations(vars.len());
+    let comb = generate_gray_combinations(vars.len());
     let mut v : Vec<String> = Vec::new();
     for c in comb
     {
@@ -273,8 +277,9 @@ pub fn quine_mccluskey(formula :&str) -> Result<String, CnfError>
     if vars.is_empty(){
         return Err(CnfError::NoVarError);
     }
-    let comb = generate_combinations(vars.len());
+    let comb = generate_gray_combinations(vars.len());
     let mut v : Vec<Vec<u8>> = Vec::new();
+    let mut true_count = 0;
     for c in comb
     {
         let mut assignation = String::from(formula);
@@ -283,15 +288,20 @@ pub fn quine_mccluskey(formula :&str) -> Result<String, CnfError>
         }
         match eval_formula(&assignation)
         {
-            Ok(true) => v.push(c.clone()),
+            Ok(true) => {v.push(c.clone()); true_count +=1;},
             Ok(false) => (),
             Err(_e) => return Err(CnfError::FormulaError),
         }
     }
+    match true_count
+    {
+        0 => return Ok("1".to_string()),
+        n if n == 1 << vars.len() => return Ok("0".to_string()),
+        _ => (),
+    }
     let prime_implicants = prime_implicants(&v);
     let map = build_hashmap(&prime_implicants, &v);
     let essentials = get_essentials(map, &v);
-    println!("essentials are {:?}", essentials);
     let mut dnf = String::new();
     for v in essentials.iter(){
         dnf += &string_representation(v, &vars);
@@ -335,6 +345,10 @@ mod test{
         assert_eq!(res, "A!B!C!||");
         let res = conjunctive_normal_form("AB|!C!&").unwrap_or_default();
         assert_eq!(res, "A!B!C!&&");
+        let res = conjunctive_normal_form("AA!&").unwrap_or_default();
+        assert_eq!(res, "0");
+        let res = conjunctive_normal_form("AA!|").unwrap_or_default();
+        assert_eq!(res, "1");
     }
 
     #[test]
@@ -346,6 +360,8 @@ mod test{
         assert_eq!(res_table, input_table);
         let res = conjunctive_normal_form("PQ=P!R&>").unwrap_or_default();
         assert_eq!(res, "PQR||P!Q!|&");
+        let res = conjunctive_normal_form("XY!=XY!=!&").unwrap_or_default();
+        assert_eq!(res, "0");
     }
 }
 

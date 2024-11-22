@@ -1,6 +1,5 @@
 use std::mem;
 
-const EXP : i16 = 991;
 const BIAS: i16 = 1023;
 
 #[derive(Debug,Clone, PartialEq)]
@@ -25,7 +24,7 @@ fn get_float_parts(f: f64) -> (i8, i16, u64)
 {
     let bits : u64 = unsafe {mem::transmute(f)};
     let sign: i8 = if bits>>63 == 0 {1} else {-1};
-    let mut expo: i16 = ((bits >> 52) & 0x7ff) as i16;
+    let expo: i16 = ((bits >> 52) & 0x7ff) as i16;
     let mantissa = if expo == 0 {
         (bits & 0xfffffffffffff) << 1
     }

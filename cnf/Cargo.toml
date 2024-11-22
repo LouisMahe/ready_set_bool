@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 boolean_evaluator = { path = "../boolean_evaluator"}
 truth_table = {path = "../truth_table"}
+gray_code = {path = "../gray_code"}

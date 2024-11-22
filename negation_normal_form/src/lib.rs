@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 #[allow(dead_code)]
 use std::fmt::Display;
+use std::env;
 use bin_tree::*;
 
 pub const NEG: char = '!';
@@ -212,18 +213,31 @@ pub fn normalize_neg(root : &Leaf<Token>)
 pub fn negation_normal_form(formula : &str) -> Result<String , ParseError>
 {
     let tree = build_tree(formula)?;
-    println!("original tree:\n");
-    bin_tree::print_tree(tree.clone());
+    let print = env::var("RUST_PRINT").unwrap_or_else(|_e| "false".to_string()) == "true";
+    if print
+    {
+        println!("original tree:\n");
+        bin_tree::print_tree(tree.clone());
+    }
 	remove_equivalent(&tree);
-    println!("Equivalences removed \n");
-    bin_tree::print_tree(tree.clone());
+    if print
+    {
+        println!("Equivalences removed \n");
+        bin_tree::print_tree(tree.clone());
+    }
     remove_implies(&tree);
-    println!("Implies removed \n");
-    bin_tree::print_tree(tree.clone());
+    if print
+    {
+        println!("Implies removed \n");
+        bin_tree::print_tree(tree.clone());
+    }
 	normalize_neg(&tree);
 	normalize_neg(&tree);
-    println!("\nnegation normal form tree: \n");
-	bin_tree::print_tree(tree.clone());
+    if print
+    {
+        println!("\nnegation normal form tree: \n");
+	    bin_tree::print_tree(tree.clone());
+    }
     Ok(string_from_tree(tree))
 }
 

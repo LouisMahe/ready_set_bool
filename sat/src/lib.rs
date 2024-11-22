@@ -1,4 +1,5 @@
 use boolean_evaluator::*;
+use gray_code::generate_gray_combinations;
 
 #[derive(Debug, PartialEq)]
 pub enum SatError
@@ -21,6 +22,7 @@ fn parse_input(input: &str) -> Vec<char>
     v
 }
 
+#[allow(dead_code)]
 fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
 {
     let mut combinations = Vec::new();
@@ -46,7 +48,7 @@ pub fn sat(formula: &str) -> Result<bool, SatError>
     {
         return Err(SatError::NoVarError);
     }
-    let combi = generate_combinations(vars.len());
+    let combi = generate_gray_combinations(vars.len());
     for combination in combi
     {
         let mut formula = String::from(formula);
@@ -80,5 +82,6 @@ mod test
         assert_eq!(sat("A1|A!&"), Ok(true));
         assert_eq!(sat("AA!="), Ok(false));
         assert_eq!(sat("PQ=P!R&>"), Ok(true));
+        assert_eq!(sat("AA!&"), Ok(false));
     }
 }
