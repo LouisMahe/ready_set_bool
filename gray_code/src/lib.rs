@@ -1,5 +1,9 @@
 #![allow(dead_code)]
 
+//this function will generate all n-size bit combination using gray code (see below)
+// because of gray code only 1 bit will change between two adjacent combination example : 00 01 11 10
+
+
 pub fn generate_gray_combinations(n : usize) -> Vec<Vec<u8>>
 {
     let mut combinations = Vec::new();
@@ -16,6 +20,10 @@ pub fn generate_gray_combinations(n : usize) -> Vec<Vec<u8>>
     }
     combinations
 }
+
+
+// the gray code function will return the gray code encoding 
+// of the given integer see (https://en.wikipedia.org/wiki/Gray_code)
 
 pub fn gray_code(a: u32) -> u32
 {

@@ -38,6 +38,9 @@ fn get_vars(formula : &str) -> Vec<char>
     vars
 }
 
+//  This function will return the set described by a logical formula applied to set
+// example : if A = {0, 1} and B = {0} then eval_set("AB&", vec![A,b]) will return Ok([0])
+
 pub fn eval_set(formula : &str, sets: Vec<Vec<i32>>) -> Result<Vec<i32>, EvalSetError>
 {
     let sets_vars = get_vars(formula);

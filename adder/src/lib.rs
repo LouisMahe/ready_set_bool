@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+// The adder function will just add two integers using bit shift operation
+
 pub fn adder(a: u32, b: u32) -> u32
 {
     let and = (a & b) << 1;

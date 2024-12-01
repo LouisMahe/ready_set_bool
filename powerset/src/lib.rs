@@ -18,6 +18,8 @@ fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
     combinations
 }
 
+// this function will generate the powerset of a given integer set
+
 pub fn powerset(set : Vec<i32>) -> Vec<Vec<i32>>
 {
     let mut powerset = Vec::new();

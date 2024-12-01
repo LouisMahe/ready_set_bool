@@ -40,6 +40,8 @@ fn generate_combinations(var_num: usize) -> Vec<Vec<u8>>
     combinations
 }
 
+// given a boolean formula with variables this function will returns true if the formula can be true and false otherwise
+// example : sat("AB&") will return true because if A and B are true the formula is true
 
 pub fn sat(formula: &str) -> Result<bool, SatError>
 {

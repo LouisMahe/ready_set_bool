@@ -2,6 +2,9 @@
 
 use adder::adder;
 
+// the multiplier function just 
+// multiply two integers using bit shifts operations
+
 pub fn multiplier(a: u32, b:u32) -> u32
 {
     let mut res = 0;
